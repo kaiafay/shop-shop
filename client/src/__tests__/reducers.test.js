@@ -4,6 +4,7 @@ import {
     UPDATE_CATEGORIES,
     UPDATE_CURRENT_CATEGORY
 } from '../utils/actions';
+import { reducer } from '../utils/reducers';
 
 // create sample of global store
 const initialState = {
