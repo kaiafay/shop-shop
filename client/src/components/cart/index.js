@@ -1,40 +1,44 @@
 import React, { useEffect } from 'react';
 import CartItem from '../CartItem';
 import Auth from '../../utils/auth';
-import { useStoreContext } from '../../utils/GlobalState';
-import { TOGGLE_CART, ADD_MULTIPLE_TO_CART } from '../../utils/actions';
 import { idbPromise } from "../../utils/helpers";
 import './style.css';
 
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleCart, addMultipleToCart } from '../../app/storeSlice'
+
 const Cart = () => {
-  const [state, dispatch] = useStoreContext();
+
+  const cart = useSelector(state => state.shop.cart);
+  const cartOpen = useSelector(state => state.shop.cartOpen);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     async function getCart() {
       const cart = await idbPromise('cart', 'get');
-      dispatch({ type: ADD_MULTIPLE_TO_CART, products: [...cart] });
+      dispatch(addMultipleToCart({products: [...cart] }));
     };
 
-    if(!state.cart.length) {
+    if(!cart.length) {
       getCart();
     }
-  }, [state.cart.length, dispatch]);
+  }, [cart.length, dispatch]);
 
-  function toggleCart() {
-    dispatch({ type: TOGGLE_CART });
+  function toggle() {
+    dispatch(toggleCart());
   }
 
   function calculateTotal() {
     let sum = 0;
-    state.cart.forEach(item => {
+    cart.forEach(item => {
       sum += item.price * item.purchaseQuantity;
     });
     return sum.toFixed(2);
   }
 
-  if (!state.cartOpen) {
+  if (!cartOpen) {
     return (
-      <div className="cart-closed" onClick={toggleCart}>
+      <div className="cart-closed" onClick={toggle}>
         <span
           role="img"
           aria-label="cart">🛒</span>
@@ -44,11 +48,11 @@ const Cart = () => {
 
   return (
     <div className="cart">
-      <div className="close" onClick={toggleCart}>[close]</div>
+      <div className="close" onClick={toggle}>[close]</div>
       <h2>Shopping Cart</h2>
-      {state.cart.length ? (
+      {cart.length ? (
         <div>
-            {state.cart.map(item => (
+            {cart.map(item => (
               <CartItem key={item._id} item={item} />
             ))}
 
