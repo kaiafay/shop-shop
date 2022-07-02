@@ -8,7 +8,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toggleCart, addMultipleToCart } from '../../app/storeSlice'
 
 const Cart = () => {
-
   const cart = useSelector(state => state.shop.cart);
   const cartOpen = useSelector(state => state.shop.cartOpen);
   const dispatch = useDispatch();

@@ -3,22 +3,21 @@ import { useQuery } from '@apollo/client';
 
 import ProductItem from '../ProductItem';
 import { QUERY_PRODUCTS } from '../../utils/queries';
-import { useStoreContext } from '../../utils/GlobalState';
-import { UPDATE_PRODUCTS } from '../../utils/actions';
 import { idbPromise } from '../../utils/helpers';
 import spinner from '../../assets/spinner.gif';
 
+import { useSelector, useDispatch } from 'react-redux';
+import { updateProducts } from '../../app/storeSlice';
+
 function ProductList() {
-  const [state, dispatch] = useStoreContext();
-  const { currentCategory } = state;
+  const currentCategory = useSelector(state => state.shop.currentCategory);
+  const products = useSelector(state => state.shop.products);
+  const dispatch = useDispatch();
   const { loading, data } = useQuery(QUERY_PRODUCTS);
 
   useEffect(() => {
     if(data) {
-      dispatch({
-        type: UPDATE_PRODUCTS,
-        products: data.products
-      });
+      dispatch(updateProducts({ products: data.products }));
 
       // save product to IndexedDB
       data.products.forEach((product) => {
@@ -28,20 +27,17 @@ function ProductList() {
       // get data from 'products' store
       idbPromise('products', 'get').then((products) => {
         // use retrieved data to set global state for offline browsing
-        dispatch({
-          type: UPDATE_PRODUCTS,
-          products: products
-        });
+        dispatch(updateProducts({ products: products }));
       });
     }
   }, [data, loading, dispatch]);
 
   function filterProducts() {
     if (!currentCategory) {
-      return state.products;
+      return products;
     }
 
-    return state.products.filter(
+    return products.filter(
       (product) => product.category._id === currentCategory
     );
   }
@@ -49,7 +45,7 @@ function ProductList() {
   return (
     <div className="my-2">
       <h2>Our Products:</h2>
-      {state.products.length ? (
+      {products.length ? (
         <div className="flex-row">
           {filterProducts().map((product) => (
             <ProductItem
