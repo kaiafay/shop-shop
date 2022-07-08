@@ -13,25 +13,25 @@ export const storeSlice = createSlice({
     initialState,
     reducers: {
         updateProducts: (state, action) => {
-            state.products = action.products
+            state.products = action.payload.products
         },
         updateCategories: (state, action) => {
-            state.categories = action.categories
+            state.categories = action.payload.categories
         },
         updateCurrentCategory: (state, action) => {
-            state.currentCategory = action.currentCategory
+            state.currentCategory = action.payload.currentCategory
         },
         addToCart: (state, action) => {
             state.cartOpen = true;
-            state.cart = action.product
+            state.cart = action.payload.product
         },
         addMultipleToCart: (state, action) => {
             state.cartOpen = true;
-            state.cart = action.products
+            state.cart = action.payload.products
         },
         removeFromCart: (state, action) => {
             let newState = state.cart.filter(product => {
-                return product._id !== action._id;
+                return product._id !== action.payload._id;
             });
 
             state.cartOpen = newState.length > 0;
@@ -40,8 +40,8 @@ export const storeSlice = createSlice({
         updateCartQuantity: (state, action) => {
             state.cartOpen = true;
             state.cart = state.cart.map(product => {
-                if(action._id === product._id) {
-                    product.purchaseQuantity = action.purchaseQuantity;
+                if(action.payload._id === product._id) {
+                    product.purchaseQuantity = action.payload.purchaseQuantity;
                 }
                 return product;
             });
